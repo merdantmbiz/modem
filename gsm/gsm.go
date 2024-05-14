@@ -72,7 +72,6 @@ func (o encoderOption) applyOption(g *GSM) {
 
 // WithEncoderOption applies the encoder option when converting from text
 // messages to SMS TPDUs.
-//
 func WithEncoderOption(eo sms.EncoderOption) Option {
 	return encoderOption{eo}
 }
@@ -349,7 +348,7 @@ func (g *GSM) StartMessageRx(mh MessageHandler, eh ErrorHandler, options ...RxOp
 	}
 	cfg := rxConfig{
 		timeout:  24 * time.Hour,
-		initCmds: []string{"+CSMS=1", "+CNMI=1,2,0,0,0"},
+		initCmds: []string{"+CSMS=0", "+CNMI=1,2,0,0,0"},
 	}
 	for _, option := range options {
 		option.applyRxOption(&cfg)

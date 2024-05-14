@@ -25,7 +25,7 @@ import (
 var version = "undefined"
 
 func main() {
-	dev := flag.String("d", "/dev/ttyUSB0", "path to modem device")
+	dev := flag.String("d", "COM8", "path to modem device")
 	baud := flag.Int("b", 115200, "baud rate")
 	timeout := flag.Duration("t", 400*time.Millisecond, "command timeout period")
 	verbose := flag.Bool("v", false, "log modem interactions")

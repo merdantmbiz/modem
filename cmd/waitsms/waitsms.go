@@ -14,10 +14,8 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"io"
 	"log"
-	"os"
 	"time"
 
 	"github.com/warthog618/modem/at"
@@ -29,18 +27,18 @@ import (
 var version = "undefined"
 
 func main() {
-	dev := flag.String("d", "/dev/ttyUSB2", "path to modem device")
+	dev := flag.String("d", "COM12", "path to modem device")
 	baud := flag.Int("b", 115200, "baud rate")
 	period := flag.Duration("p", 10*time.Minute, "period to wait")
 	timeout := flag.Duration("t", 400*time.Millisecond, "command timeout period")
-	verbose := flag.Bool("v", false, "log modem interactions")
+	verbose := flag.Bool("v", true, "log modem interactions")
 	hex := flag.Bool("x", false, "hex dump modem responses")
-	vsn := flag.Bool("version", false, "report version and exit")
+	//vsn := flag.Bool("version", false, "report version and exit")
 	flag.Parse()
-	if *vsn {
-		fmt.Printf("%s %s\n", os.Args[0], version)
-		os.Exit(0)
-	}
+	//if *vsn {
+	//	fmt.Printf("%s %s\n", os.Args[0], version)
+	//	os.Exit(0)
+	//}
 	m, err := serial.New(serial.WithPort(*dev), serial.WithBaud(*baud))
 	if err != nil {
 		log.Println(err)
@@ -60,7 +58,7 @@ func main() {
 		return
 	}
 
-	go pollSignalQuality(g, timeout)
+	//go pollSignalQuality(g, timeout)
 
 	err = g.StartMessageRx(
 		func(msg gsm.Message) {
