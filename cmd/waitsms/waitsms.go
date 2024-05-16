@@ -27,6 +27,7 @@ import (
 var version = "undefined"
 
 func main() {
+	//todo 1 move config values to env
 	dev := flag.String("d", "COM12", "path to modem device")
 	baud := flag.Int("b", 115200, "baud rate")
 	period := flag.Duration("p", 10*time.Minute, "period to wait")
@@ -63,6 +64,9 @@ func main() {
 	err = g.StartMessageRx(
 		func(msg gsm.Message) {
 			log.Printf("%s: %s\n", msg.Number, msg.Message)
+			//todo 2
+			// Generate authCode hash save to redis with phone number
+			// SEND TO GRPC Client
 		},
 		func(err error) {
 			log.Printf("err: %v\n", err)
