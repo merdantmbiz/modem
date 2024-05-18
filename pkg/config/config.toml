@@ -1,0 +1,6 @@
+[JWT]
+    SECRETKEY = "#12d1oacn981;S1saasd1weada"
+    EXPIRES_AT = 24
+
+[MODEM]
+    PORT = "COM12"

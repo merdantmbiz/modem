@@ -22,6 +22,8 @@ import (
 
 	"github.com/warthog618/modem/at"
 	"github.com/warthog618/modem/gsm"
+	"github.com/warthog618/modem/pkg/config"
+	"github.com/warthog618/modem/pkg/jwt"
 	"github.com/warthog618/modem/serial"
 	"github.com/warthog618/modem/trace"
 )
@@ -29,7 +31,14 @@ import (
 var version = "undefined"
 
 func main() {
-	dev := flag.String("d", "/dev/ttyUSB2", "path to modem device")
+
+	err := config.InitTomlConf("config", "./pkg/config")
+
+	if err != nil {
+		log.Println(err)
+	}
+
+	dev := flag.String("d", config.TomlConf.MODEM.PORT, "path to modem device")
 	baud := flag.Int("b", 115200, "baud rate")
 	period := flag.Duration("p", 10*time.Minute, "period to wait")
 	timeout := flag.Duration("t", 400*time.Millisecond, "command timeout period")
@@ -63,8 +72,18 @@ func main() {
 	go pollSignalQuality(g, timeout)
 
 	err = g.StartMessageRx(
+		//message arrived
 		func(msg gsm.Message) {
-			log.Printf("%s: %s\n", msg.Number, msg.Message)
+
+			//generate jwt token for phone number
+			token, err := jwt.GenerateJWT(msg.Number)
+
+			if err != nil {
+				log.Println(err)
+				return
+			}
+
+			log.Printf("%s: %s\n", msg.Number, token)
 		},
 		func(err error) {
 			log.Printf("err: %v\n", err)
