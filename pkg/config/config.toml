@@ -3,4 +3,4 @@
     EXPIRES_AT = 24
 
 [MODEM]
-    PORT = "COM12"
+    PORT = "COM5"

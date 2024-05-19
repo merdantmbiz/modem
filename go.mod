@@ -7,6 +7,8 @@ require (
 	github.com/stretchr/testify v1.8.4
 	github.com/tarm/serial v0.0.0-20180830185346-98f6abe2eb07
 	github.com/warthog618/sms v0.3.0
+	google.golang.org/grpc v1.64.0
+	google.golang.org/protobuf v1.33.0
 )
 
 go 1.13
