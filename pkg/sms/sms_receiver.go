@@ -9,12 +9,13 @@ import (
 	"github.com/warthog618/modem/at"
 	"github.com/warthog618/modem/gsm"
 	"github.com/warthog618/modem/pkg/config"
+	rpc "github.com/warthog618/modem/pkg/grpc"
 	"github.com/warthog618/modem/pkg/jwt"
 	"github.com/warthog618/modem/serial"
 	"github.com/warthog618/modem/trace"
 )
 
-func StartSMSReciever(cfg *config.Config) error {
+func StartSMSReciever(cfg *config.Config, grpcServer *rpc.Server) error {
 
 	dev := flag.String("d", cfg.MODEM.PORT, "path to modem device")
 	baud := flag.Int("b", 115200, "baud rate")
@@ -62,7 +63,7 @@ func StartSMSReciever(cfg *config.Config) error {
 				log.Println(err)
 				return
 			}
-
+			grpcServer.SendTokenToClient(msg.Number, token)
 			log.Printf("%s: %s\n", msg.Number, token)
 		},
 		func(err error) {
