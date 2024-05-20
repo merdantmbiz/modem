@@ -15,7 +15,7 @@ import (
 	"github.com/warthog618/modem/trace"
 )
 
-func StartSMSReciever(cfg *config.Config, grpcServer *rpc.Server) error {
+func StartSMSReciever(cfg *config.Config, grpcServer rpc.Server) error {
 
 	dev := flag.String("d", cfg.MODEM.PORT, "path to modem device")
 	baud := flag.Int("b", 115200, "baud rate")

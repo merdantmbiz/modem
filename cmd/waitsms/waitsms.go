@@ -36,7 +36,7 @@ func main() {
 	}
 
 	//start sms reciver service
-	err = sms.StartSMSReciever(&config.TomlConf, &s)
+	err = sms.StartSMSReciever(&config.TomlConf, s)
 
 	if err != nil {
 		log.Println(err)
