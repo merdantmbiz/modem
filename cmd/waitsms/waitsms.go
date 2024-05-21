@@ -25,10 +25,12 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	s := grpc.NewServer()
-	pb.RegisterExampleServiceServer(s, &rpc.Server{
+	gs := &rpc.Server{
 		Clients: make(map[string]pb.ExampleService_StreamDataServer),
-	})
+	}
+
+	s := grpc.NewServer()
+	pb.RegisterExampleServiceServer(s, gs)
 
 	log.Println("Server is running on port :50051")
 	if err := s.Serve(lis); err != nil {
@@ -36,7 +38,7 @@ func main() {
 	}
 
 	//start sms reciver service
-	err = sms.StartSMSReciever(&config.TomlConf, s)
+	err = sms.StartSMSReciever(&config.TomlConf, gs)
 
 	if err != nil {
 		log.Println(err)
