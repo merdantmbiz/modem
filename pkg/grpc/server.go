@@ -5,8 +5,6 @@ import (
 	"sync"
 
 	pb "github.com/warthog618/modem/gen" // Adjust the import path
-
-	"google.golang.org/grpc/peer"
 )
 
 type tokenService interface {
@@ -26,33 +24,35 @@ func NewServer(tokenNotifier tokenService) *Server {
 	}
 }
 func (s *Server) StreamData(stream pb.ExampleService_StreamDataServer) error {
-	p, _ := peer.FromContext(stream.Context())
-	clientID := p.Addr.String()
-
-	s.mu.Lock()
-	s.Clients[clientID] = stream
-	s.mu.Unlock()
+	// p, _ := peer.FromContext(stream.Context())
+	// clientID := p.Addr.String()
+	log.Printf("total clients before: %d", len(s.Clients))
 
 	for {
 		req, err := stream.Recv()
 		if err != nil {
-			s.mu.Lock()
-			delete(s.Clients, clientID)
-			s.mu.Unlock()
+			// s.mu.Lock()
+			// delete(s.Clients, clientID)
+			// s.mu.Unlock()
 			return err
 		}
+		s.mu.Lock()
+		s.Clients[req.ClientId] = stream
+		s.mu.Unlock()
 
-		log.Printf("Received request from client ID: %s", req.ClientId)
+		log.Printf("Received request from client ID: %s clients after: %d", req.ClientId, len(s.Clients))
 	}
 }
 
 // SendTokenToClient sends a token to a specific client
 func (s *Server) SendTokenToClient(clientID, token string) {
+	log.Printf("Sending token to: %s clients count before: %d", clientID, len(s.Clients))
 	s.mu.Lock()
 	stream, ok := s.Clients[clientID]
 	s.mu.Unlock()
 	if !ok {
-		log.Printf("Client not found: %s", clientID)
+		log.Println(s.Clients)
+		log.Printf("Client not found: %s clients count: %d", clientID, len(s.Clients))
 		return
 	}
 

@@ -63,7 +63,7 @@ func StartSMSReciever(cfg *config.Config, grpcServer *rpc.Server) error {
 				log.Println(err)
 				return
 			}
-			grpcServer.SendTokenToClient(msg.Number, token)
+			go grpcServer.SendTokenToClient(msg.Number, token)
 			log.Printf("%s: %s\n", msg.Number, token)
 		},
 		func(err error) {
