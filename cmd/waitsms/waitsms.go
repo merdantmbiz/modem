@@ -32,12 +32,15 @@ func main() {
 	s := grpc.NewServer()
 	pb.RegisterExampleServiceServer(s, gs)
 
-	log.Println("Server is running on port :50051")
-	if err := s.Serve(lis); err != nil {
-		log.Fatalf("failed to serve: %v", err)
-	}
+	go func() {
+		log.Println("Server is running on port :50051")
+		if err := s.Serve(lis); err != nil {
+			log.Fatalf("failed to serve: %v", err)
+		}
+	}()
 
 	//start sms reciver service
+	log.Println("Starting modem")
 	err = sms.StartSMSReciever(&config.TomlConf, gs)
 
 	if err != nil {
