@@ -58,7 +58,7 @@ func (s *Server) SendTokenToClient(clientID, token string) {
 
 	response := &pb.StreamResponse{
 		ClientId:     clientID,
-		ResponseData: "Token: " + token,
+		ResponseData: token,
 	}
 	if err := stream.Send(response); err != nil {
 		log.Printf("Error sending token to client ID: %s, error: %v", clientID, err)
