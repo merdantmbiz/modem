@@ -19,7 +19,7 @@ func StartSMSReciever(cfg *config.Config, grpcServer *rpc.Server) error {
 
 	dev := flag.String("d", cfg.MODEM.PORT, "path to modem device")
 	baud := flag.Int("b", 115200, "baud rate")
-	period := flag.Duration("p", 10*time.Minute, "period to wait")
+	//	period := flag.Duration("p", 10*time.Minute, "period to wait")
 	timeout := flag.Duration("t", 400*time.Millisecond, "command timeout period")
 	verbose := flag.Bool("v", false, "log modem interactions")
 	hex := flag.Bool("x", false, "hex dump modem responses")
@@ -42,7 +42,7 @@ func StartSMSReciever(cfg *config.Config, grpcServer *rpc.Server) error {
 		mio = trace.New(m)
 	}
 
-	g := gsm.New(at.New(mio, at.WithTimeout(*timeout)))
+	g := gsm.New(at.New(mio))
 
 	err = g.Init()
 
@@ -76,9 +76,9 @@ func StartSMSReciever(cfg *config.Config, grpcServer *rpc.Server) error {
 
 	for {
 		select {
-		case <-time.After(*period):
-			log.Println("exiting...")
-			return nil
+		// case <-time.After(*period):
+		// 	log.Println("exiting...")
+		// 	return nil
 		case <-g.Closed():
 			log.Fatal("modem closed, exiting...")
 		}

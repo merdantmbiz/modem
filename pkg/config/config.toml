@@ -4,3 +4,6 @@
 
 [MODEM]
     PORT = "COM9"
+
+[GRPC]
+    PORT = ":50000"

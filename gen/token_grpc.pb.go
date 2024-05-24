@@ -19,50 +19,48 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ExampleService_StreamData_FullMethodName = "/auth.ExampleService/StreamData"
-	ExampleService_SendToken_FullMethodName  = "/auth.ExampleService/SendToken"
+	AuthService_StreamData_FullMethodName = "/auth.AuthService/StreamData"
 )
 
-// ExampleServiceClient is the client API for ExampleService service.
+// AuthServiceClient is the client API for AuthService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type ExampleServiceClient interface {
-	StreamData(ctx context.Context, opts ...grpc.CallOption) (ExampleService_StreamDataClient, error)
-	SendToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*TokenResponse, error)
+type AuthServiceClient interface {
+	StreamData(ctx context.Context, opts ...grpc.CallOption) (AuthService_StreamDataClient, error)
 }
 
-type exampleServiceClient struct {
+type authServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewExampleServiceClient(cc grpc.ClientConnInterface) ExampleServiceClient {
-	return &exampleServiceClient{cc}
+func NewAuthServiceClient(cc grpc.ClientConnInterface) AuthServiceClient {
+	return &authServiceClient{cc}
 }
 
-func (c *exampleServiceClient) StreamData(ctx context.Context, opts ...grpc.CallOption) (ExampleService_StreamDataClient, error) {
-	stream, err := c.cc.NewStream(ctx, &ExampleService_ServiceDesc.Streams[0], ExampleService_StreamData_FullMethodName, opts...)
+func (c *authServiceClient) StreamData(ctx context.Context, opts ...grpc.CallOption) (AuthService_StreamDataClient, error) {
+	stream, err := c.cc.NewStream(ctx, &AuthService_ServiceDesc.Streams[0], AuthService_StreamData_FullMethodName, opts...)
 	if err != nil {
 		return nil, err
 	}
-	x := &exampleServiceStreamDataClient{stream}
+	x := &authServiceStreamDataClient{stream}
 	return x, nil
 }
 
-type ExampleService_StreamDataClient interface {
+type AuthService_StreamDataClient interface {
 	Send(*StreamRequest) error
 	Recv() (*StreamResponse, error)
 	grpc.ClientStream
 }
 
-type exampleServiceStreamDataClient struct {
+type authServiceStreamDataClient struct {
 	grpc.ClientStream
 }
 
-func (x *exampleServiceStreamDataClient) Send(m *StreamRequest) error {
+func (x *authServiceStreamDataClient) Send(m *StreamRequest) error {
 	return x.ClientStream.SendMsg(m)
 }
 
-func (x *exampleServiceStreamDataClient) Recv() (*StreamResponse, error) {
+func (x *authServiceStreamDataClient) Recv() (*StreamResponse, error) {
 	m := new(StreamResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -70,66 +68,53 @@ func (x *exampleServiceStreamDataClient) Recv() (*StreamResponse, error) {
 	return m, nil
 }
 
-func (c *exampleServiceClient) SendToken(ctx context.Context, in *TokenRequest, opts ...grpc.CallOption) (*TokenResponse, error) {
-	out := new(TokenResponse)
-	err := c.cc.Invoke(ctx, ExampleService_SendToken_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// ExampleServiceServer is the server API for ExampleService service.
-// All implementations must embed UnimplementedExampleServiceServer
+// AuthServiceServer is the server API for AuthService service.
+// All implementations must embed UnimplementedAuthServiceServer
 // for forward compatibility
-type ExampleServiceServer interface {
-	StreamData(ExampleService_StreamDataServer) error
-	SendToken(context.Context, *TokenRequest) (*TokenResponse, error)
-	mustEmbedUnimplementedExampleServiceServer()
+type AuthServiceServer interface {
+	StreamData(AuthService_StreamDataServer) error
+	mustEmbedUnimplementedAuthServiceServer()
 }
 
-// UnimplementedExampleServiceServer must be embedded to have forward compatible implementations.
-type UnimplementedExampleServiceServer struct {
+// UnimplementedAuthServiceServer must be embedded to have forward compatible implementations.
+type UnimplementedAuthServiceServer struct {
 }
 
-func (UnimplementedExampleServiceServer) StreamData(ExampleService_StreamDataServer) error {
+func (UnimplementedAuthServiceServer) StreamData(AuthService_StreamDataServer) error {
 	return status.Errorf(codes.Unimplemented, "method StreamData not implemented")
 }
-func (UnimplementedExampleServiceServer) SendToken(context.Context, *TokenRequest) (*TokenResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SendToken not implemented")
-}
-func (UnimplementedExampleServiceServer) mustEmbedUnimplementedExampleServiceServer() {}
+func (UnimplementedAuthServiceServer) mustEmbedUnimplementedAuthServiceServer() {}
 
-// UnsafeExampleServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ExampleServiceServer will
+// UnsafeAuthServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AuthServiceServer will
 // result in compilation errors.
-type UnsafeExampleServiceServer interface {
-	mustEmbedUnimplementedExampleServiceServer()
+type UnsafeAuthServiceServer interface {
+	mustEmbedUnimplementedAuthServiceServer()
 }
 
-func RegisterExampleServiceServer(s grpc.ServiceRegistrar, srv ExampleServiceServer) {
-	s.RegisterService(&ExampleService_ServiceDesc, srv)
+func RegisterAuthServiceServer(s grpc.ServiceRegistrar, srv AuthServiceServer) {
+	s.RegisterService(&AuthService_ServiceDesc, srv)
 }
 
-func _ExampleService_StreamData_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(ExampleServiceServer).StreamData(&exampleServiceStreamDataServer{stream})
+func _AuthService_StreamData_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(AuthServiceServer).StreamData(&authServiceStreamDataServer{stream})
 }
 
-type ExampleService_StreamDataServer interface {
+type AuthService_StreamDataServer interface {
 	Send(*StreamResponse) error
 	Recv() (*StreamRequest, error)
 	grpc.ServerStream
 }
 
-type exampleServiceStreamDataServer struct {
+type authServiceStreamDataServer struct {
 	grpc.ServerStream
 }
 
-func (x *exampleServiceStreamDataServer) Send(m *StreamResponse) error {
+func (x *authServiceStreamDataServer) Send(m *StreamResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 
-func (x *exampleServiceStreamDataServer) Recv() (*StreamRequest, error) {
+func (x *authServiceStreamDataServer) Recv() (*StreamRequest, error) {
 	m := new(StreamRequest)
 	if err := x.ServerStream.RecvMsg(m); err != nil {
 		return nil, err
@@ -137,40 +122,17 @@ func (x *exampleServiceStreamDataServer) Recv() (*StreamRequest, error) {
 	return m, nil
 }
 
-func _ExampleService_SendToken_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(TokenRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ExampleServiceServer).SendToken(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ExampleService_SendToken_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ExampleServiceServer).SendToken(ctx, req.(*TokenRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// ExampleService_ServiceDesc is the grpc.ServiceDesc for ExampleService service.
+// AuthService_ServiceDesc is the grpc.ServiceDesc for AuthService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ExampleService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "auth.ExampleService",
-	HandlerType: (*ExampleServiceServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "SendToken",
-			Handler:    _ExampleService_SendToken_Handler,
-		},
-	},
+var AuthService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "auth.AuthService",
+	HandlerType: (*AuthServiceServer)(nil),
+	Methods:     []grpc.MethodDesc{},
 	Streams: []grpc.StreamDesc{
 		{
 			StreamName:    "StreamData",
-			Handler:       _ExampleService_StreamData_Handler,
+			Handler:       _AuthService_StreamData_Handler,
 			ServerStreams: true,
 			ClientStreams: true,
 		},

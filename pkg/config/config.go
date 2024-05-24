@@ -8,4 +8,7 @@ type Config struct {
 	MODEM struct {
 		PORT string
 	}
+	GRPC struct {
+		PORT string
+	}
 }

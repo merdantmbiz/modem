@@ -20,20 +20,20 @@ func main() {
 	}
 
 	//start grpc stream
-	lis, err := net.Listen("tcp", ":50051")
+	lis, err := net.Listen("tcp", config.TomlConf.GRPC.PORT)
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
 	gs := &rpc.Server{
-		Clients: make(map[string]pb.ExampleService_StreamDataServer),
+		Clients: make(map[string]pb.AuthService_StreamDataServer),
 	}
 
 	s := grpc.NewServer()
-	pb.RegisterExampleServiceServer(s, gs)
+	pb.RegisterAuthServiceServer(s, gs)
 
 	go func() {
-		log.Println("Server is running on port :50051")
+		log.Printf("Server is running on port :%s", config.TomlConf.GRPC.PORT)
 		if err := s.Serve(lis); err != nil {
 			log.Fatalf("failed to serve: %v", err)
 		}

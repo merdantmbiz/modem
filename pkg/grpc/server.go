@@ -7,23 +7,17 @@ import (
 	pb "github.com/warthog618/modem/gen" // Adjust the import path
 )
 
-type tokenService interface {
-	SendTokenToClient(clientID, token string) error
-}
-type Server struct {
-	pb.UnimplementedExampleServiceServer
-	mu            sync.Mutex
-	Clients       map[string]pb.ExampleService_StreamDataServer
-	tokenNotifier tokenService
+type AuthService interface {
+	SendTokenToClient(clientID, token string)
 }
 
-func NewServer(tokenNotifier tokenService) *Server {
-	return &Server{
-		Clients:       make(map[string]pb.ExampleService_StreamDataServer),
-		tokenNotifier: tokenNotifier,
-	}
+type Server struct {
+	pb.UnimplementedAuthServiceServer
+	mu      sync.Mutex
+	Clients map[string]pb.AuthService_StreamDataServer
 }
-func (s *Server) StreamData(stream pb.ExampleService_StreamDataServer) error {
+
+func (s *Server) StreamData(stream pb.AuthService_StreamDataServer) error {
 	// p, _ := peer.FromContext(stream.Context())
 	// clientID := p.Addr.String()
 	log.Printf("total clients before: %d", len(s.Clients))
@@ -46,7 +40,6 @@ func (s *Server) StreamData(stream pb.ExampleService_StreamDataServer) error {
 
 // SendTokenToClient sends a token to a specific client
 func (s *Server) SendTokenToClient(clientID, token string) {
-	log.Printf("Sending token to: %s clients count before: %d", clientID, len(s.Clients))
 	s.mu.Lock()
 	stream, ok := s.Clients[clientID]
 	s.mu.Unlock()
@@ -62,6 +55,9 @@ func (s *Server) SendTokenToClient(clientID, token string) {
 	}
 	if err := stream.Send(response); err != nil {
 		log.Printf("Error sending token to client ID: %s, error: %v", clientID, err)
+		s.mu.Lock()
+		delete(s.Clients, clientID)
+		s.mu.Unlock()
 	} else {
 		log.Printf("Token sent to client ID: %s", clientID)
 	}

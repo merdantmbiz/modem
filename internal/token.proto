@@ -4,9 +4,8 @@ package auth;
 
 option go_package = "./gen;auth";
 
-service ExampleService {
+service AuthService {
   rpc StreamData (stream StreamRequest) returns (stream StreamResponse);
-  rpc SendToken (TokenRequest) returns (TokenResponse);
 }
 
 message StreamRequest {
@@ -17,13 +16,4 @@ message StreamRequest {
 message StreamResponse {
   string client_id = 1;
   string response_data = 2;
-}
-
-message TokenRequest {
-  string client_id = 1;
-  string event = 2;
-}
-
-message TokenResponse {
-  string token = 1;
 }
