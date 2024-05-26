@@ -25,9 +25,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	gs := &rpc.Server{
-		Clients: make(map[string]pb.AuthService_AuthStreamServer),
-	}
+	gs := rpc.NewAuthService()
 
 	s := grpc.NewServer()
 	pb.RegisterAuthServiceServer(s, gs)

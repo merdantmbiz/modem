@@ -3,7 +3,7 @@
     EXPIRES_AT = 24
 
 [MODEM]
-    PORT = "COM9"
+    PORT = "COM5"
 
 [GRPC]
     PORT = ":50000"

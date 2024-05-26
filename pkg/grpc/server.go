@@ -11,13 +11,13 @@ type AuthStreamService interface {
 	SendTokenToClient(clientID, token string)
 }
 
-type Server struct {
+type server struct {
 	pb.UnimplementedAuthServiceServer
 	mu      sync.Mutex
 	Clients map[string]pb.AuthService_AuthStreamServer
 }
 
-func (s *Server) StreamData(stream pb.AuthService_AuthStreamServer) error {
+func (s *server) StreamData(stream pb.AuthService_AuthStreamServer) error {
 	// p, _ := peer.FromContext(stream.Context())
 	// clientID := p.Addr.String()
 	log.Printf("total clients before: %d", len(s.Clients))
@@ -39,7 +39,7 @@ func (s *Server) StreamData(stream pb.AuthService_AuthStreamServer) error {
 }
 
 // SendTokenToClient sends a token to a specific client
-func (s *Server) SendTokenToClient(clientID, token string) {
+func (s *server) SendTokenToClient(clientID, token string) {
 	s.mu.Lock()
 	stream, ok := s.Clients[clientID]
 	s.mu.Unlock()

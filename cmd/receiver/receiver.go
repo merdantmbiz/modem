@@ -13,15 +13,15 @@ import (
 
 func main() {
 	// Set up a connection to the server.
-	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure(), grpc.WithBlock())
+	conn, err := grpc.Dial("localhost:50000", grpc.WithInsecure(), grpc.WithBlock())
 	if err != nil {
 		log.Fatalf("did not connect: %v", err)
 	}
 	defer conn.Close()
-	client := pb.NewExampleServiceClient(conn)
+	client := pb.NewAuthServiceClient(conn)
 
 	// Call the StreamData method
-	stream, err := client.StreamData(context.Background())
+	stream, err := client.AuthStream(context.Background())
 	if err != nil {
 		log.Fatalf("could not open stream: %v", err)
 	}
@@ -30,7 +30,7 @@ func main() {
 
 	// Send messages to the stream in a goroutine
 	go func() {
-		req := &pb.StreamRequest{
+		req := &pb.AuthRequest{
 			ClientId:    "+99363432211",
 			RequestData: fmt.Sprintf("request_data_%d", 1),
 		}
