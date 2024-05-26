@@ -7,17 +7,17 @@ import (
 	pb "github.com/warthog618/modem/gen" // Adjust the import path
 )
 
-type AuthService interface {
+type AuthStreamService interface {
 	SendTokenToClient(clientID, token string)
 }
 
 type Server struct {
 	pb.UnimplementedAuthServiceServer
 	mu      sync.Mutex
-	Clients map[string]pb.AuthService_StreamDataServer
+	Clients map[string]pb.AuthService_AuthStreamServer
 }
 
-func (s *Server) StreamData(stream pb.AuthService_StreamDataServer) error {
+func (s *Server) StreamData(stream pb.AuthService_AuthStreamServer) error {
 	// p, _ := peer.FromContext(stream.Context())
 	// clientID := p.Addr.String()
 	log.Printf("total clients before: %d", len(s.Clients))
@@ -49,7 +49,7 @@ func (s *Server) SendTokenToClient(clientID, token string) {
 		return
 	}
 
-	response := &pb.StreamResponse{
+	response := &pb.AuthResponse{
 		ClientId:     clientID,
 		ResponseData: token,
 	}

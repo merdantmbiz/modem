@@ -26,7 +26,7 @@ func main() {
 	}
 
 	gs := &rpc.Server{
-		Clients: make(map[string]pb.AuthService_StreamDataServer),
+		Clients: make(map[string]pb.AuthService_AuthStreamServer),
 	}
 
 	s := grpc.NewServer()
