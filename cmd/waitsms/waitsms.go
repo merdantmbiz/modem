@@ -25,7 +25,7 @@ func main() {
 		log.Fatalf("failed to listen: %v", err)
 	}
 
-	gs := rpc.NewAuthService()
+	gs := rpc.NewAuthStreamService()
 
 	s := grpc.NewServer()
 	pb.RegisterAuthServiceServer(s, gs)
