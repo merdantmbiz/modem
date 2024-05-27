@@ -1,19 +1,23 @@
 package grpc
 
 import (
+	"context"
+	"fmt"
 	"log"
 	"sync"
 
 	pb "github.com/warthog618/modem/gen" // Adjust the import path
+	"github.com/warthog618/modem/pkg/jwt"
 )
 
 type IAuthService interface {
 	pb.AuthServiceServer
-	SendTokenToClient(clientID, token string)
+	pb.OTPServiceServer
 }
 
 type authStreamServer struct {
 	pb.UnimplementedAuthServiceServer
+	pb.UnimplementedOTPServiceServer
 	mu      sync.Mutex
 	Clients map[string]pb.AuthService_AuthStreamServer
 }
@@ -44,27 +48,32 @@ func (s *authStreamServer) AuthStream(stream pb.AuthService_AuthStreamServer) er
 	}
 }
 
-// SendTokenToClient sends a token to a specific client
-func (s *authStreamServer) SendTokenToClient(clientID, token string) {
+func (s *authStreamServer) PassOTP(ctx context.Context, req *pb.OTPRequest) (*pb.OTPResponse, error) {
+	token, err := jwt.GenerateJWT(req.ClientId)
 	s.mu.Lock()
-	stream, ok := s.Clients[clientID]
+	stream, ok := s.Clients[req.ClientId]
 	s.mu.Unlock()
+
 	if !ok {
-		log.Println(s.Clients)
-		log.Printf("Client not found: %s clients count: %d", clientID, len(s.Clients))
-		return
+		return &pb.OTPResponse{
+			ClientId: fmt.Sprintf("Client not found: %s clients count: %d", req.ClientId, len(s.Clients)),
+		}, err
 	}
 
 	response := &pb.AuthResponse{
-		ClientId:     clientID,
+		ClientId:     req.ClientId,
 		ResponseData: token,
 	}
 	if err := stream.Send(response); err != nil {
-		log.Printf("Error sending token to client ID: %s, error: %v", clientID, err)
+		log.Printf("Error sending token to client ID: %s, error: %v", req.ClientId, err)
 		s.mu.Lock()
-		delete(s.Clients, clientID)
+		delete(s.Clients, req.ClientId)
 		s.mu.Unlock()
 	} else {
-		log.Printf("Token sent to client ID: %s", clientID)
+		log.Printf("Token sent to client ID: %s", req.ClientId)
 	}
+
+	return &pb.OTPResponse{
+		ClientId: req.ClientId,
+	}, err
 }

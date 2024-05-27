@@ -1,21 +1,26 @@
 package sms
 
 import (
+	"context"
 	"flag"
 	"io"
 	"log"
 	"time"
 
 	"github.com/warthog618/modem/at"
+	pb "github.com/warthog618/modem/gen"
 	"github.com/warthog618/modem/gsm"
 	"github.com/warthog618/modem/pkg/config"
-	rpc "github.com/warthog618/modem/pkg/grpc"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
+
+	//	rpc "github.com/warthog618/modem/pkg/grpc"
 	"github.com/warthog618/modem/pkg/jwt"
 	"github.com/warthog618/modem/serial"
 	"github.com/warthog618/modem/trace"
 )
 
-func StartSMSReciever(cfg *config.Config, grpcServer rpc.IAuthService) error {
+func StartSMSReciever(cfg *config.Config) error {
 
 	dev := flag.String("d", cfg.MODEM.PORT, "path to modem device")
 	baud := flag.Int("b", 115200, "baud rate")
@@ -63,7 +68,7 @@ func StartSMSReciever(cfg *config.Config, grpcServer rpc.IAuthService) error {
 				log.Println(err)
 				return
 			}
-			go grpcServer.SendTokenToClient(msg.Number, token)
+			go notifyAuth(msg.Number)
 			log.Printf("%s: %s\n", msg.Number, token)
 		},
 		func(err error) {
@@ -103,4 +108,27 @@ func pollSignalQuality(g *gsm.GSM, timeout *time.Duration) {
 			return
 		}
 	}
+}
+
+func notifyAuth(clientId string) {
+	// Set up a connection to the server.
+	ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+	defer cancel()
+	// Set up a connection to the server.
+	conn, err := grpc.NewClient("localhost:50000", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Fatalf("did not connect: %v", err)
+	}
+	defer conn.Close()
+
+	c := pb.NewOTPServiceClient(conn)
+
+	r, err := c.PassOTP(ctx, &pb.OTPRequest{ClientId: clientId})
+
+	if err != nil {
+		log.Fatalf("could not greet: %v", err)
+	}
+
+	// Print the response from the server
+	log.Printf("Greeting: %s", r.ClientId)
 }
